@@ -533,7 +533,6 @@ const App: React.FC = () => {
             initialGoal={projectGoal}
             initialDate={targetDate}
           />
-    }
   }
 }}
             user={user}
