@@ -532,10 +532,8 @@ const App: React.FC = () => {
             onOpenProjectLibrary={() => setIsProjectLibraryOpen(true)}
             initialGoal={projectGoal}
             initialDate={targetDate}
-          />
-  }
-}}
             user={user}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
           />
         );
     }
