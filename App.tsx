@@ -531,7 +531,12 @@ const App: React.FC = () => {
             onLoadTemplate={handleLoadTemplate}
             onOpenProjectLibrary={() => setIsProjectLibraryOpen(true)}
             initialGoal={projectGoal}
-            initialDate={targetDate}
+            initialDate={targetDate
+            }
+        )
+    }
+  }
+}}
             user={user}
           />
         );
