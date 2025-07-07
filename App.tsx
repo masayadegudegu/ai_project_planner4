@@ -474,257 +474,132 @@ const App: React.FC = () => {
       );
     }
 
-switch (currentView) {
-  case ViewState.PROJECT_FLOW:
+    switch (currentView) {
+      case ViewState.PROJECT_FLOW:
+        return (
+          <ProjectFlowDisplay
+            tasks={tasks}
+            projectGoal={projectGoal}
+            targetDate={targetDate}
+            onSelectTask={handleSelectTask}
+            onUpdateTaskExtendedDetails={() => {}} // This is handled by opening the modal
+            onUpdateTaskPosition={handleUpdateTaskPosition}
+            onStartNewProject={handleStartNewProject}
+            onExportProject={handleExportProject}
+            onSaveProject={handleSaveProject}
+            onOpenProjectLibrary={() => setIsProjectLibraryOpen(true)}
+            onAddTask={() => setIsAddTaskModalOpen(true)}
+            onRemoveTask={handleRemoveTask}
+            onUpdateTaskStatus={handleUpdateTaskStatus}
+            onImportSingleTask={() => {}} // Placeholder for now
+            onAutoLayout={() => setTasksWithHistory(prev => autoLayoutTasks([...prev]))}
+            onUndo={handleUndo}
+            canUndo={history.length > 0}
+            onRedo={handleRedo}
+            canRedo={redoHistory.length > 0}
+            generateUniqueId={generateUniqueId}
+            onUpdateTaskConnections={handleUpdateTaskConnections}
+            ganttData={ganttData}
+            setGanttData={setGanttData}
+            onCustomReportGenerated={handleCustomReportGenerated}
+            onClearApiKey={handleClearApiKey}
+            currentProjectId={currentProjectId}
+            user={user}
+          />
+        );
+      case ViewState.TASK_DETAIL:
+        return (
+          selectedTask && (
+            <TaskDetailModal
+              task={selectedTask}
+              onClose={handleCloseTaskDetail}
+              onUpdateTaskCoreInfo={handleUpdateTaskCoreInfo}
+              onUpdateExtendedDetails={handleUpdateTaskExtendedDetails}
+              generateUniqueId={generateUniqueId}
+              projectGoal={projectGoal}
+              targetDate={targetDate}
+            />
+          )
+        );
+      case ViewState.INPUT_FORM:
+      default:
+        return (
+          <ProjectInputForm
+            onSubmit={handleSubmit}
+            isLoading={isLoadingPlan}
+            onImportProject={handleImportProject}
+            onLoadTemplate={handleLoadTemplate}
+            onOpenProjectLibrary={() => setIsProjectLibraryOpen(true)}
+            initialGoal={projectGoal}
+            initialDate={targetDate}
+            user={user}
+          />
+        );
+    }
+  };
+
+  if (authLoading) {
     return (
-      <ProjectFlowDisplay
-        tasks={tasks}
-        projectGoal={projectGoal}
-        targetDate={targetDate}
-        onSelectTask={handleSelectTask}
-        onUpdateTaskExtendedDetails={() => {}} // This is handled by opening the modal
-        onUpdateTaskPosition={handleUpdateTaskPosition}
-        onStartNewProject={handleStartNewProject}
-        onExportProject={handleExportProject}
-        onSaveProject={handleSaveProject}
-        onOpenProjectLibrary={() => setIsProjectLibraryOpen(true)}
-        onAddTask={() => setIsAddTaskModalOpen(true)}
-        onRemoveTask={handleRemoveTask}
-        onUpdateTaskStatus={handleUpdateTaskStatus}
-        onImportSingleTask={() => {}} // Placeholder for now
-        onAutoLayout={() => setTasksWithHistory(prev => autoLayoutTasks([...prev]))}
-        onUndo={handleUndo}
-        canUndo={history.length > 0}
-        onRedo={handleRedo}
-        canRedo={redoHistory.length > 0}
-        generateUniqueId={generateUniqueId}
-        onUpdateTaskConnections={handleUpdateTaskConnections}
-        ganttData={ganttData}
-        setGanttData={setGanttData}
-        onCustomReportGenerated={handleCustomReportGenerated}
-        onClearApiKey={handleClearApiKey}
-        currentProjectId={currentProjectId}
-        user={user}
-      />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700">
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p>読み込み中...</p>
+        </div>
+      </div>
     );
-  case ViewState.TASK_DETAIL:
-    return (
-      selectedTask && (
-        <TaskDetailModal
-          task={selectedTask}
-          onClose={handleCloseTaskDetail}
-          onUpdateTaskCoreInfo={handleUpdateTaskCoreInfo}
-          onUpdateExtendedDetails={handleUpdateTaskExtendedDetails}
-          generateUniqueId={generateUniqueId}
+  }
+
+  return (
+    <div className="h-full w-full">
+      {renderContent()}
+      
+      {/* Modals */}
+      {isAddTaskModalOpen && (
+        <AddTaskModal
+          onClose={() => setIsAddTaskModalOpen(false)}
+          onSubmit={handleAddTaskFromModal}
+        />
+      )}
+      
+      {customReportDeck && (
+        <SlideEditorView
+          tasks={tasks}
+          initialDeck={customReportDeck}
+          onSave={(deck) => setCustomReportDeck(deck)}
+          onClose={() => setCustomReportDeck(null)}
           projectGoal={projectGoal}
           targetDate={targetDate}
-        />
-      )
-    );
-  case ViewState.INPUT_FORM:
-  default:
-    return (
-      <ProjectInputForm
-        onSubmit={handleSubmit}
-        isLoading={isLoadingPlan}
-        onImportProject={handleImportProject}
-        onLoadTemplate={handleLoadTemplate}
-        onOpenProjectLibrary={() => setIsProjectLibraryOpen(true)}
-        initialGoal={projectGoal}
-        initialDate={targetDate}
-        user={user}
-      />
-    );
-}
-
-if (authLoading) {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700">
-      <div className="text-white text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-        <p>読み込み中...</p>
-      </div>
-    </div>
-  );
-}
-
-return (
-  <div className="h-full w-full">
-    {renderContent()}
-    
-    {/* Modals */}
-    {isAddTaskModalOpen && (
-      <AddTaskModal
-        onClose={() => setIsAddTaskModalOpen(false)}
-        onSubmit={handleAddTaskFromModal}
-      />
-    )}
-    
-    {customReportDeck && (
-      <SlideEditorView
-        tasks={tasks}
-        initialDeck={customReportDeck}
-        onSave={(deck) => setCustomReportDeck(deck)}
-        onClose={() => setCustomReportDeck(null)}
-        projectGoal={projectGoal}
-        targetDate={targetDate}
-        reportScope="project"
-        generateUniqueId={generateUniqueId}
-      />
-    )}
-
-    <AuthModal
-      isOpen={isAuthModalOpen}
-      onClose={() => setIsAuthModalOpen(false)}
-      mode={authMode}
-      onModeChange={setAuthMode}
-    />
-
-    <ProjectLibraryModal
-      isOpen={isProjectLibraryOpen}
-      onClose={() => setIsProjectLibraryOpen(false)}
-      onLoadProject={handleLoadProject}
-      onImportProject={handleImportProject}
-    />
-
-    <ProjectSaveModal
-      isOpen={isProjectSaveModalOpen}
-      onClose={() => setIsProjectSaveModalOpen(false)}
-      projectGoal={projectGoal}
-      targetDate={targetDate}
-      tasks={tasks}
-      ganttData={ganttData}
-      currentProjectId={currentProjectId}
-      onSaved={(projectId) => setCurrentProjectId(projectId)}
-    />
-  </div>
-);
-
-export default App;
-switch (currentView) {
-  case ViewState.PROJECT_FLOW:
-    return (
-      <ProjectFlowDisplay
-        tasks={tasks}
-        projectGoal={projectGoal}
-        targetDate={targetDate}
-        onSelectTask={handleSelectTask}
-        onUpdateTaskExtendedDetails={() => {}} // This is handled by opening the modal
-        onUpdateTaskPosition={handleUpdateTaskPosition}
-        onStartNewProject={handleStartNewProject}
-        onExportProject={handleExportProject}
-        onSaveProject={handleSaveProject}
-        onOpenProjectLibrary={() => setIsProjectLibraryOpen(true)}
-        onAddTask={() => setIsAddTaskModalOpen(true)}
-        onRemoveTask={handleRemoveTask}
-        onUpdateTaskStatus={handleUpdateTaskStatus}
-        onImportSingleTask={() => {}} // Placeholder for now
-        onAutoLayout={() => setTasksWithHistory(prev => autoLayoutTasks([...prev]))}
-        onUndo={handleUndo}
-        canUndo={history.length > 0}
-        onRedo={handleRedo}
-        canRedo={redoHistory.length > 0}
-        generateUniqueId={generateUniqueId}
-        onUpdateTaskConnections={handleUpdateTaskConnections}
-        ganttData={ganttData}
-        setGanttData={setGanttData}
-        onCustomReportGenerated={handleCustomReportGenerated}
-        onClearApiKey={handleClearApiKey}
-        currentProjectId={currentProjectId}
-        user={user}
-      />
-    );
-  case ViewState.TASK_DETAIL:
-    return (
-      selectedTask && (
-        <TaskDetailModal
-          task={selectedTask}
-          onClose={handleCloseTaskDetail}
-          onUpdateTaskCoreInfo={handleUpdateTaskCoreInfo}
-          onUpdateExtendedDetails={handleUpdateTaskExtendedDetails}
+          reportScope="project"
           generateUniqueId={generateUniqueId}
-          projectGoal={projectGoal}
-          targetDate={targetDate}
         />
-      )
-    );
-  case ViewState.INPUT_FORM:
-  default:
-    return (
-      <ProjectInputForm
-        onSubmit={handleSubmit}
-        isLoading={isLoadingPlan}
+      )}
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        mode={authMode}
+        onModeChange={setAuthMode}
+      />
+
+      <ProjectLibraryModal
+        isOpen={isProjectLibraryOpen}
+        onClose={() => setIsProjectLibraryOpen(false)}
+        onLoadProject={handleLoadProject}
         onImportProject={handleImportProject}
-        onLoadTemplate={handleLoadTemplate}
-        onOpenProjectLibrary={() => setIsProjectLibraryOpen(true)}
-        initialGoal={projectGoal}
-        initialDate={targetDate}
-        user={user}
       />
-    );
-}
 
-if (authLoading) {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-700">
-      <div className="text-white text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-        <p>読み込み中...</p>
-      </div>
-    </div>
-  );
-}
-
-return (
-  <div className="h-full w-full">
-    {renderContent()}
-    
-    {/* Modals */}
-    {isAddTaskModalOpen && (
-      <AddTaskModal
-        onClose={() => setIsAddTaskModalOpen(false)}
-        onSubmit={handleAddTaskFromModal}
-      />
-    )}
-    
-    {customReportDeck && (
-      <SlideEditorView
-        tasks={tasks}
-        initialDeck={customReportDeck}
-        onSave={(deck) => setCustomReportDeck(deck)}
-        onClose={() => setCustomReportDeck(null)}
+      <ProjectSaveModal
+        isOpen={isProjectSaveModalOpen}
+        onClose={() => setIsProjectSaveModalOpen(false)}
         projectGoal={projectGoal}
         targetDate={targetDate}
-        reportScope="project"
-        generateUniqueId={generateUniqueId}
+        tasks={tasks}
+        ganttData={ganttData}
+        currentProjectId={currentProjectId}
+        onSaved={(projectId) => setCurrentProjectId(projectId)}
       />
-    )}
-
-    <AuthModal
-      isOpen={isAuthModalOpen}
-      onClose={() => setIsAuthModalOpen(false)}
-      mode={authMode}
-      onModeChange={setAuthMode}
-    />
-
-    <ProjectLibraryModal
-      isOpen={isProjectLibraryOpen}
-      onClose={() => setIsProjectLibraryOpen(false)}
-      onLoadProject={handleLoadProject}
-      onImportProject={handleImportProject}
-    />
-
-    <ProjectSaveModal
-      isOpen={isProjectSaveModalOpen}
-      onClose={() => setIsProjectSaveModalOpen(false)}
-      projectGoal={projectGoal}
-      targetDate={targetDate}
-      tasks={tasks}
-      ganttData={ganttData}
-      currentProjectId={currentProjectId}
-      onSaved={(projectId) => setCurrentProjectId(projectId)}
-    />
-  </div>
-);
+    </div>
+  );
+};
 
 export default App;
